@@ -1,0 +1,31 @@
+# requirements.txt
+
+# Web Framework
+fastapi
+uvicorn[standard]
+
+# LLM, RAG, and Vector Store
+langchain
+langchain-google-genai
+langchain-community
+sentence-transformers
+chromadb
+
+# Database Connector (Penting untuk NL-to-SQL)
+SQLAlchemy
+
+# Opsional: Untuk environment variables
+python-dotenv
+
+# read yml
+PyYAML
+
+# Data Manipulation
+SQLAlchemy
+PyMySQL
+pandas
+sqlparse
+
+# rate limit
+slowapi
+Jinja2

@@ -1,0 +1,36 @@
+# --- Virtual Environment ---
+# Folder ini berisi semua library Python yang diinstall, ukurannya besar
+# dan spesifik untuk setiap komputer. Cukup di-generate ulang dari requirements.txt.
+.venv/
+venv/
+env/
+
+# --- File Rahasia ---
+# JANGAN PERNAH mengirim file .env ke GitHub karena berisi API key dan password.
+.env
+
+# --- Database Vektor Lokal ---
+# Folder ini di-generate oleh script ingest dan bisa berukuran besar.
+# Sebaiknya di-generate ulang di setiap lingkungan, bukan di-version control.
+chroma_db/
+
+# --- Python Cache ---
+# File-file cache yang dibuat otomatis oleh Python.
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- File IDE/Editor ---
+# Pengaturan spesifik untuk editor kode Anda.
+.vscode/
+.idea/
+
+# --- File Sistem Operasi ---
+# File metadata yang dibuat oleh macOS dan Windows.
+.DS_Store
+Thumbs.db
+
+# --- File Log dan Output ---
+*.log
+*.out
