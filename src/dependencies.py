@@ -1,12 +1,17 @@
 # src/dependencies.py
 
+import os
+from dotenv import load_dotenv
 from langchain_community.vectorstores import Qdrant
 from qdrant_client import QdrantClient
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.retrievers import BaseRetriever
 
+# Load environment variables
+load_dotenv()
+
 # Qdrant Configuration
-QDRANT_URL = "http://localhost:6333"
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 COLLECTION_NAME = "schema_vectors"
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 

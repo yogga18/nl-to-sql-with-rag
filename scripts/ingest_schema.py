@@ -106,6 +106,9 @@ EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 # Nama koleksi di Qdrant
 COLLECTION_NAME = "schema_vectors"
 
+# Qdrant URL dari environment variable
+QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+
 # --- 2. FORMATTER ---
 def format_schema_from_yaml(yaml_data: dict) -> str:
     """
@@ -163,15 +166,15 @@ embeddings = HuggingFaceEmbeddings(
 )
 
 # --- 6. CONNECT KE QDRANT ---
-print("Menyambungkan ke Qdrant di localhost:6333...")
-qdrant = QdrantClient(url="http://localhost:6333")
+print(f"Menyambungkan ke Qdrant di {QDRANT_URL}...")
+qdrant = QdrantClient(url=QDRANT_URL)
 
 # --- 7. INGEST KE QDRANT ---
 print(f"Menyimpan embeddings ke Qdrant collection: {COLLECTION_NAME}...")
 db = Qdrant.from_documents(
     chunks,
     embeddings,
-    url="http://localhost:6333",
+    url=QDRANT_URL,
     collection_name=COLLECTION_NAME
 )
 
