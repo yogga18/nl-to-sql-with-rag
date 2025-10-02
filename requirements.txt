@@ -9,7 +9,7 @@ langchain
 langchain-google-genai
 langchain-community
 sentence-transformers
-chromadb
+qdrant-client
 
 # Database Connector (Penting untuk NL-to-SQL)
 SQLAlchemy

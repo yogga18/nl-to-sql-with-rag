@@ -1,10 +1,13 @@
 # src/dependencies.py
 
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import Qdrant
+from qdrant_client import QdrantClient
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.retrievers import BaseRetriever
 
-DB_PATH = "chroma_db/"
+# Qdrant Configuration
+QDRANT_URL = "http://localhost:6333"
+COLLECTION_NAME = "schema_vectors"
 EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 
 def get_embedding_function():
@@ -19,14 +22,18 @@ def get_embedding_function():
 
 def get_retriever() -> BaseRetriever:
     """
-    Memuat database vektor ChromaDB dan mengembalikannya sebagai retriever.
+    Memuat database vektor Qdrant dan mengembalikannya sebagai retriever.
     Retriever ini bertugas mencari konteks skema yang relevan.
     """
     embedding_function = get_embedding_function()
     
-    db = Chroma(
-        persist_directory=DB_PATH, 
-        embedding_function=embedding_function
+    # Connect to Qdrant
+    client = QdrantClient(url=QDRANT_URL)
+    
+    db = Qdrant(
+        client=client,
+        collection_name=COLLECTION_NAME,
+        embeddings=embedding_function
     )
     
     # Mengambil 2 potongan konteks paling relevan

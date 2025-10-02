@@ -143,7 +143,7 @@ def read_root():
     summary="🔧 Generate SQL Query Only",
     description="Mengkonversi pertanyaan bahasa natural menjadi query SQL tanpa eksekusi")
 @limiter.limit("25/minute")
-def generate_sql(request: QueryRequest):
+def generate_sql(request_body: QueryRequest, request: Request):
     """
     ## Generate SQL Query Only
     
@@ -167,7 +167,7 @@ def generate_sql(request: QueryRequest):
     - "Berapa total realisasi anggaran tahun 2024?"
     - "Daftar unit kerja di Direktorat Keuangan"
     """
-    question = request.question
+    question = request_body.question
     print(f"Menerima pertanyaan: {question}")
 
     # --- LANGKAH 1: ROUTING ---
@@ -200,7 +200,7 @@ def generate_sql(request: QueryRequest):
     summary="🚀 Complete NL-to-SQL Workflow",
     description="Alur kerja lengkap: Generate SQL → Validasi → Eksekusi → Analisis hasil")
 @limiter.limit("25/minute")
-def ask(request: QueryRequest):
+def ask(request_body: QueryRequest, request: Request):
     """
     ## Complete NL-to-SQL Workflow
     
@@ -232,7 +232,7 @@ def ask(request: QueryRequest):
     - Business intelligence queries
     - Quick data insights
     """
-    question = request.question
+    question = request_body.question
     print(f"Menerima pertanyaan: {question}")
 
     # === LANGKAH 1: ROUTING ===
@@ -302,7 +302,7 @@ def ask(request: QueryRequest):
     summary="💬 Contextual NL-to-SQL with Memory",
     description="Alur kerja lengkap dengan memori percakapan untuk pertanyaan follow-up")
 @limiter.limit("25/minute")
-def ask_contextual(request: ContextualQueryRequest):
+def ask_contextual(request_body: ContextualQueryRequest, request: Request):
     """
     ## Contextual NL-to-SQL with Conversation Memory
     
@@ -337,8 +337,8 @@ def ask_contextual(request: ContextualQueryRequest):
     - **Follow-up Queries**: Mendukung pertanyaan lanjutan
     - **Session Management**: Isolasi percakapan per user/session
     """
-    question = request.question
-    conversation_id = request.conversation_id
+    question = request_body.question
+    conversation_id = request_body.conversation_id
     print(f"Menerima pertanyaan untuk sesi [{conversation_id}]: {question}")
 
     # 1. Ambil atau buat riwayat untuk sesi ini
@@ -405,7 +405,7 @@ def ask_contextual(request: ContextualQueryRequest):
     summary="⚡ Generate SQL + Execute (Raw Data)",
     description="Generate SQL dan eksekusi langsung, return data mentah tanpa analisis AI")
 @limiter.limit("25/minute")
-def generate_sql_without_analyze(request: QueryRequest):
+def generate_sql_without_analyze(request_body: QueryRequest, request: Request):
     """
     ## Generate SQL + Execute (Raw Data Only)
     
@@ -432,7 +432,7 @@ def generate_sql_without_analyze(request: QueryRequest):
     
     **⚠️ Note**: Tidak ada analisis AI, cocok untuk developer yang ingin mengolah data sendiri.
     """
-    question = request.question
+    question = request_body.question
     print(f"Menerima pertanyaan: {question}")
 
     # Routing
@@ -477,7 +477,7 @@ def generate_sql_without_analyze(request: QueryRequest):
     summary="💬 Contextual Analysis (No SQL Exposure)",
     description="Percakapan contextual dengan analisis lengkap, tidak menampilkan query SQL")
 @limiter.limit("25/minute")
-def context_nl_to_sql_without_query(request: ContextualQueryRequest):
+def context_nl_to_sql_without_query(request_body: ContextualQueryRequest, request: Request):
     """
     ## Contextual Analysis (No SQL Exposure)
     
@@ -511,8 +511,8 @@ def context_nl_to_sql_without_query(request: ContextualQueryRequest):
     Business user bertanya tentang budget, mendapat jawaban natural tanpa perlu tahu 
     SQL query apa yang dijalankan di background.
     """
-    question = request.question
-    conversation_id = request.conversation_id
+    question = request_body.question
+    conversation_id = request_body.conversation_id
     print(f"Menerima pertanyaan untuk sesi [{conversation_id}]: {question}")
 
     # Ambil riwayat percakapan

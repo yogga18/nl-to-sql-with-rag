@@ -18,30 +18,6 @@ DATABASE_URL = f"mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}
 # Membuat engine SQLAlchemy
 engine = create_engine(DATABASE_URL)
 
-# def execute_sql_query(query: str):
-#     """
-#     Mengeksekusi query SQL mentah dengan aman dan mengembalikan hasilnya
-#     dalam format string yang bisa dibaca oleh LLM.
-#     """
-#     print(f"Mengeksekusi query: {query}")
-#     try:
-#         # Menggunakan 'with' memastikan koneksi ditutup secara otomatis
-#         with engine.connect() as connection:
-#             # Menggunakan text() dari SQLAlchemy membantu mencegah SQL Injection
-#             result_df = pd.read_sql_query(sql=text(query), con=connection)
-            
-#             if result_df.empty:
-#                 return "Query berhasil dieksekusi, namun tidak ada data yang ditemukan."
-            
-#             # Mengubah DataFrame menjadi format string tabel yang rapi
-#             # Ini adalah format yang sangat baik untuk dipahami oleh LLM
-#             return result_df.to_string()
-            
-#     except Exception as e:
-#         # Menangkap error jika SQL yang di-generate oleh LLM tidak valid
-#         print(f"Error saat eksekusi SQL: {e}")
-#         return f"Terjadi error saat eksekusi SQL: {str(e)}"
-
 def execute_sql_query(query: str):
     """
     Mengeksekusi query SQL dan mengembalikan hasilnya sebagai
