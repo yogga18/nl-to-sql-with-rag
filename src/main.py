@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+import os
 from .nl2sql_service import create_nl2sql_chain, create_router_chain, create_analysis_chain, create_nl2sql_with_conversation_chain, create_analysis_with_conversation_chain
 from .db_executor import execute_sql_query
 import pandas as pd
@@ -58,6 +60,28 @@ app = FastAPI(
         "name": "MIT License",
         "url": "https://opensource.org/licenses/MIT"
     }
+)
+
+# ============================================================================
+# CORS CONFIGURATION - PRODUCTION READY
+# ============================================================================
+# Konfigurasi CORS untuk mengizinkan akses dari domain yang diizinkan
+# Untuk security yang lebih baik, set ALLOWED_ORIGINS di environment variable
+
+# Get allowed origins from environment variable
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*")
+if ALLOWED_ORIGINS == "*":
+    origins = ["*"]
+else:
+    # Split multiple origins separated by comma
+    origins = [origin.strip() for origin in ALLOWED_ORIGINS.split(",")]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # Inisialisasi rate limiter
