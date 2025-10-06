@@ -31,9 +31,9 @@ class QueryRequest(BaseModel):
 
 # Inisialisasi aplikasi FastAPI dengan dokumentasi lengkap
 app = FastAPI(
-    title="🤖 NL-to-SQL Service API",
+    title="🤖 NL-to-SQL Service API - TESTING CI/CD",
     description="""
-    API Cerdas untuk Mengkonversi Bahasa Natural ke Query SQL
+    ## API Cerdas untuk Mengkonversi Bahasa Natural ke Query SQL
     
     API ini menggunakan teknologi RAG (Retrieval-Augmented Generation) dan Google Gemini AI untuk:
     - 🔍 Menganalisis pertanyaan dalam bahasa Indonesia

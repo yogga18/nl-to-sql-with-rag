@@ -40,7 +40,7 @@ jobs:
             git pull origin main
             
             # Aktifkan virtual environment
-            source venv/bin/activate
+            source ven/bin/activate
             
             # Install atau update dependensi
             pip install -r requirements.txt
