@@ -34,7 +34,7 @@ jobs:
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             # GANTI DENGAN PATH PROYEK ANDA DI VPS
-            cd /path/to/your/fastapi/project
+            cd /var/www/be/nl-to-sql-with-rag
             
             # Tarik perubahan terbaru dari branch main
             git pull origin main
@@ -46,7 +46,7 @@ jobs:
             pip install -r requirements.txt
             
             # GANTI DENGAN NAMA PROSES PM2 ANDA
-            pm2 restart nama-aplikasi-pm2
+            pm2 restart be-nl-to-sql
             
             echo "Deployment successful!"
           EOF
