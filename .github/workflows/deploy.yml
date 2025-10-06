@@ -1,52 +1,51 @@
-# Nama workflow yang akan tampil di tab Actions GitHub
 name: Deploy to VPS
 
-# Pemicu: workflow ini akan berjalan setiap kali ada push ke branch 'main'
 on:
   push:
     branches:
       - main
 
-# Daftar pekerjaan yang akan dijalankan
 jobs:
   deploy:
-    # Menggunakan runner Ubuntu versi terbaru dari GitHub
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Python dengan cache dependencies
+      # 2️⃣ Setup Python (kalau dibutuhkan di langkah build)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: "pip"
 
-      # 3. Install dependencies di runner (optional — hanya jika diperlukan di langkah build)
+      # 3️⃣ Install dependencies (optional)
       - name: Install Python dependencies (local runner)
         run: pip install -r requirements.txt
 
-      # 4. Setup SSH agar bisa konek ke VPS
+      # 4️⃣ Setup SSH agar bisa konek ke VPS
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      # 5. Tambahkan VPS ke known_hosts
+      # 5️⃣ Tambahkan VPS ke known_hosts (supaya koneksi SSH aman)
       - name: Add VPS to known_hosts
         run: ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      # 6. Deploy ke VPS
+      # 6️⃣ Deploy ke VPS
       - name: Deploy to VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e  # <-- berhenti kalau ada error
+
             cd /var/www/be/nl-to-sql-with-rag
 
             echo "🔄 Pulling latest changes..."
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
 
             echo "🐍 Activating virtual environment..."
             source ven/bin/activate
@@ -55,7 +54,8 @@ jobs:
             pip install -r requirements.txt
 
             echo "🚀 Restarting PM2 process..."
-            /home/candra/.local/share/fnm/node-versions/v18.18.2/installation/lib/node_modules/pm2/bin/pm2 restart be-nl-to-sql
+            export PATH=\$PATH:/home/candra/.local/share/fnm/node-versions/v18.18.2/installation/bin
+            /home/candra/.local/share/fnm/node-versions/v18.18.2/installation/lib/node_modules/pm2/bin/pm2 restart be-nl-to-sql --update-env
 
             echo "✅ Deployment successful!"
           EOF
