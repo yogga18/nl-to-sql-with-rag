@@ -1,0 +1,52 @@
+# Nama workflow yang akan tampil di tab Actions GitHub
+name: Deploy to VPS
+
+# Pemicu: workflow ini akan berjalan setiap kali ada push ke branch 'main'
+on:
+  push:
+    branches:
+      - main
+
+# Daftar pekerjaan yang akan dijalankan
+jobs:
+  deploy:
+    # Menggunakan runner Ubuntu versi terbaru dari GitHub
+    runs-on: ubuntu-latest
+
+    # Langkah-langkah yang akan dieksekusi
+    steps:
+      # 1. Mengambil kode dari repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Menyiapkan koneksi SSH ke VPS
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
+
+      # 3. Menambahkan IP VPS ke known_hosts
+      - name: Add VPS to known_hosts
+        run: ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      # 4. Menjalankan perintah deployment di VPS
+      - name: Deploy to VPS
+        run: |
+          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
+            # GANTI DENGAN PATH PROYEK ANDA DI VPS
+            cd /path/to/your/fastapi/project
+            
+            # Tarik perubahan terbaru dari branch main
+            git pull origin main
+            
+            # Aktifkan virtual environment
+            source venv/bin/activate
+            
+            # Install atau update dependensi
+            pip install -r requirements.txt
+            
+            # GANTI DENGAN NAMA PROSES PM2 ANDA
+            pm2 restart nama-aplikasi-pm2
+            
+            echo "Deployment successful!"
+          EOF
