@@ -13,39 +13,48 @@ jobs:
     # Menggunakan runner Ubuntu versi terbaru dari GitHub
     runs-on: ubuntu-latest
 
-    # Langkah-langkah yang akan dieksekusi
     steps:
       # 1. Mengambil kode dari repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Menyiapkan koneksi SSH ke VPS
+      # 2. Setup Python dengan Caching
+      - name: Set up Python with dependency caching
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10" # Sesuaikan dengan versi python Anda
+          cache: "pip"
+
+      # 3. Install dependencies di runner GitHub
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # 4. Menyiapkan koneksi SSH ke VPS
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      # 3. Menambahkan IP VPS ke known_hosts
+      # 5. Menambahkan IP VPS ke known_hosts
       - name: Add VPS to known_hosts
         run: ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      # 4. Menjalankan perintah deployment di VPS
+      # 6. Menjalankan perintah deployment di VPS
       - name: Deploy to VPS
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            # GANTI DENGAN PATH PROYEK ANDA DI VPS
             cd /var/www/be/nl-to-sql-with-rag
             
-            # Tarik perubahan terbaru dari branch main
             git pull origin main
             
-            # Aktifkan virtual environment
             source ven/bin/activate
             
-            # Install atau update dependensi
             pip install -r requirements.txt
             
-            # GANTI DENGAN NAMA PROSES PM2 ANDA
+            # BARIS INI DITAMBAHKAN UNTUK MENGAKTIFKAN FNM
+            eval "$(fnm env)"
+            
+            # Sekarang perintah pm2 akan ditemukan
             pm2 restart be-nl-to-sql
             
             echo "Deployment successful!"
