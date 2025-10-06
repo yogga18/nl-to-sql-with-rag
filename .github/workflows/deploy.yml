@@ -14,49 +14,48 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code (Tetap sama)
-      - name: Checkout code
+      # 1. Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Python & Caching (Tetap sama)
-      - name: Set up Python with dependency caching
+      # 2. Setup Python dengan cache dependencies
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: "pip"
 
-      # 3. Install dependencies di runner (Tetap sama)
-      - name: Install dependencies
+      # 3. Install dependencies di runner (optional — hanya jika diperlukan di langkah build)
+      - name: Install Python dependencies (local runner)
         run: pip install -r requirements.txt
 
-      # 4. Setup SSH (Tetap sama)
+      # 4. Setup SSH agar bisa konek ke VPS
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.VPS_SSH_KEY }}
 
-      # 5. Add VPS to known_hosts (Tetap sama)
+      # 5. Tambahkan VPS ke known_hosts
       - name: Add VPS to known_hosts
         run: ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
 
-      # 6. Deploy to VPS (Dengan Perbaikan Final)
+      # 6. Deploy ke VPS
       - name: Deploy to VPS
         run: |
-          ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
-            # MEMUAT KONFIGURASI BASH UNTUK MENGENALI FNM
-            source ~/.bashrc
-            
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd /var/www/be/nl-to-sql-with-rag
-            
+
+            echo "🔄 Pulling latest changes..."
             git pull origin main
-            
+
+            echo "🐍 Activating virtual environment..."
             source ven/bin/activate
-            
+
+            echo "📦 Installing Python dependencies..."
             pip install -r requirements.txt
-            
-            # Sekarang perintah fnm dan pm2 akan ditemukan
-            eval "$(fnm env)"
-            pm2 restart be-nl-to-sql
-            
-            echo "Deployment successful!"
+
+            echo "🚀 Restarting PM2 process..."
+            /home/candra/.local/share/fnm/node-versions/v18.18.2/installation/lib/node_modules/pm2/bin/pm2 restart be-nl-to-sql
+
+            echo "✅ Deployment successful!"
           EOF
