@@ -31,7 +31,7 @@ class QueryRequest(BaseModel):
 
 # Inisialisasi aplikasi FastAPI dengan dokumentasi lengkap
 app = FastAPI(
-    title="🤖 NL-to-SQL Service API -  Trigger Deploy",
+    title="🤖 NL-to-SQL Service API -  Trigger Deploy Lagi......",
     description="""
     ## API Cerdas untuk Mengkonversi Bahasa Natural ke Query SQL
     
