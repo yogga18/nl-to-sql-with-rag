@@ -6,6 +6,7 @@ uvicorn[standard]
 langchain
 langchain-google-genai
 langchain-community
+langchain-openai
 sentence-transformers
 qdrant-client
 
@@ -32,6 +33,7 @@ tiktoken
 google-generativeai
 transformers
 httpx
+openai
 
 # Opsional: Logging & debugging
 loguru
