@@ -1,0 +1,55 @@
+## 📊 Penjelasan per property
+
+- **`model`: `"gemini-2.5-flash"`**  
+  → Nama model LLM yang dipakai untuk semua step (klasifikasi, SQL generation, analisis).
+
+---
+
+### 🔹 Routing / Klasifikasi
+- **`router_input`: 17**  
+  → Jumlah token yang dipakai untuk *prompt klasifikasi* (template + pertanyaan user).  
+- **`router_output`: 5**  
+  → Jumlah token yang dihasilkan model sebagai jawaban klasifikasi (misalnya `"data_perusahaan"`).  
+- **`router_total`: 22**  
+  → Total token usage di step klasifikasi = input (17) + output (5).
+
+---
+
+### 🔹 SQL Generation
+- **`sql_input`: 17**  
+  → Token input untuk step generate SQL (template SQL + pertanyaan + context retriever).  
+- **`sql_output`: 27**  
+  → Token output berupa query SQL yang dihasilkan.  
+- **`sql_total`: 44**  
+  → Total token usage di step SQL generation = input (17) + output (27).
+
+---
+
+### 🔹 Analysis
+- **`analysis_input`: 1267**  
+  → Token input untuk step analisis. Ini besar karena prompt analisis berisi:  
+    - Template analisis  
+    - Pertanyaan user  
+    - **Seluruh hasil query SQL (raw data)** yang panjang.  
+- **`analysis_output`: 93**  
+  → Token output berupa jawaban analisis natural language.  
+- **`analysis_total`: 1360**  
+  → Total token usage di step analisis = input (1267) + output (93).
+
+---
+
+### 🔹 Grand Total
+- **`grand_total`: 1426**  
+  → Jumlah semua token dari ketiga step:  
+    - Routing (22)  
+    - SQL Generation (44)  
+    - Analysis (1360)  
+    - **Total = 1426 tokens**
+
+---
+
+## 🎯 Intinya
+- **router\_*** → biaya token untuk klasifikasi pertanyaan.  
+- **sql\_*** → biaya token untuk membuat query SQL.  
+- **analysis\_*** → biaya token untuk analisis hasil query (biasanya paling besar karena raw data ikut dihitung).  
+- **grand\_total** → total keseluruhan token yang dipakai dalam workflow end‑to‑end.  

@@ -1,0 +1,40 @@
+Setting Hyperparameter (temperature, top_k, top_p)
+
+Untuk use case SQL generation, kita ingin deterministik, minim variasi. Jadi:
+
+•  temperature: 0.0 – 0.2  
+    → supaya model tidak kreatif berlebihan, hanya fokus ke query yang valid.
+•  top_p: 0.9 – 1.0  
+    → tetap biarkan distribusi luas, tapi karena temperature rendah, hasilnya tetap stabil.
+•  top_k: 50 – 100 (kalau model mendukung)  
+    → cukup untuk variasi kecil, tapi tidak terlalu membatasi.
+
+Kombinasi aman = temperature = 0.1, top_p=0.95, top_k=50
+
+
+Setup robust + enterprise-ready:
+•  Claude 3.5 Sonnet untuk SQL generation (schema-aware).
+•  GPT-4.1 untuk analisis hasil query.
+•  Hyperparameter: temperature=0.1, top_p=0.95, top_k=50.
+
+Context Window kapasitas memori jangka pendek model contoh  Model dengan context 8k token → bisa menampung kira‑kira 20 halaman teks. sekali jalan
+
+
+# Flow exsisting
+1. user input promt (tekon input)
+2. validasi pertanyaan menggunakan gemini (token input + template validasi)
+3.     prompt = PromptTemplate(
+        template=SUPER_STRONG_SQL_PROMPT_TEMPLATE,
+        input_variables=["context", "question"],
+        partial_variables={"chat_history": "Tidak ada riwayat percakapan."} # Mengabaikan history
+    )
+
+    sql_chain = (
+        {
+            "context": retriever, 
+            "question": RunnablePassthrough()
+        }
+        | prompt
+        | llm
+        | StrOutputParser()
+    )

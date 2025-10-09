@@ -1,19 +1,15 @@
-# src/dependencies.py
-
 import os
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Qdrant
-from qdrant_client import QdrantClient
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_core.retrievers import BaseRetriever
+from src.db.config_qdrant import get_qdrant_client, get_qdrant_settings
 
-# Load environment variables
 load_dotenv()
 
-# Qdrant Configuration
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
-COLLECTION_NAME = "schema_vectors"
-EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
+# Embedding model (must match ingest)
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-base-en-v1.5")
+
 
 def get_embedding_function():
     """
@@ -25,6 +21,7 @@ def get_embedding_function():
         model_kwargs={'device': 'cpu'}
     )
 
+
 def get_retriever() -> BaseRetriever:
     """
     Memuat database vektor Qdrant dan mengembalikannya sebagai retriever.
@@ -32,12 +29,13 @@ def get_retriever() -> BaseRetriever:
     """
     embedding_function = get_embedding_function()
     
-    # Connect to Qdrant
-    client = QdrantClient(url=QDRANT_URL)
-    
+    # Connect to Qdrant using centralized config helper
+    client = get_qdrant_client()
+    settings = get_qdrant_settings()
+
     db = Qdrant(
         client=client,
-        collection_name=COLLECTION_NAME,
+        collection_name=settings.get("collection", "schema_vectors"),
         embeddings=embedding_function
     )
     

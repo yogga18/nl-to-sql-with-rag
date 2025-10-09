@@ -3,7 +3,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
 from operator import itemgetter
-from .dependencies import get_retriever
+from src.retrieval.dependencies import get_retriever
 
 # --- PROMPT UTAMA UNTUK SEMUA FUNGSI SQL ---
 # Mendefinisikan prompt super kuat sebagai konstanta untuk digunakan kembali (Prinsip DRY)
@@ -36,14 +36,18 @@ Pertanyaan Pengguna Baru: {question}
 Query SQL:
 """
 
-# --- FUNGSI-FUNGSI PEMBUAT CHAIN ---
+# FUNGSI CHAIN 
+# create_nl2sql_chain untuk nl to sql tanpa memori
+# create_nl2sql_with_conversation_chain untuk nl to sql dengan memori
+# get_retriever untuk mendapatkan retriever dari dependencies.py mencari data yang memiliki konteks paling relevan dikembalikan sebanyak K=2
+# dua fungsi tersebut membuetuhkan retriever karena membutuhkan konteks skema untuk mencegah halusinasi nama kolom
 
-def create_nl2sql_chain():
+def create_nl2sql_chain(model_name: str):
     """
     Membuat RAG chain (STATELESS) untuk proses Text-to-SQL.
     """
     retriever = get_retriever()
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0) 
+    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0) 
     
     prompt = PromptTemplate(
         template=SUPER_STRONG_SQL_PROMPT_TEMPLATE,
@@ -75,11 +79,8 @@ def create_nl2sql_with_conversation_chain():
         input_variables=["chat_history", "context", "question"]
     )
 
-    # Struktur chain ini sudah benar
     chain = (
         RunnablePassthrough.assign(
-            # itemgetter("question") akan mengambil nilai string dari key 'question'
-            # dan HANYA string itulah yang diberikan ke retriever.
             context=itemgetter("question") | retriever
         )
         | prompt
@@ -89,11 +90,17 @@ def create_nl2sql_with_conversation_chain():
     
     return chain
 
-def create_router_chain():
+# FUNGSI DI BAWAH INI UNTUK = 
+# KLASIFIKASI 
+# ANALISIS
+# ANALISIS DENGAN MEMORI
+# data yang di gunakan didapat dari hasil query sql dan di kembalikan ke gemini untuk di klasifikasikan dan di analisa maka dari itu tidak membutuhkan retriever lagi
+
+def create_router_chain(model_name: str):
     """
     Membuat chain sederhana untuk mengklasifikasikan niat pengguna.
     """
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0)
     template = """
     Anda adalah sebuah AI klasifikasi. Klasifikasikan pertanyaan pengguna ke dalam salah satu dari dua kategori berikut:
     1. "data_perusahaan": Jika pertanyaan berkaitan dengan anggaran, realisasi, sisa dana, kegiatan, unit kerja, sasaran strategis, program, atau data internal lainnya.
@@ -106,11 +113,11 @@ def create_router_chain():
     router_chain = prompt | llm | StrOutputParser()
     return router_chain
 
-def create_analysis_chain():
+def create_analysis_chain(model_name: str):
     """
     Membuat chain untuk menganalisis hasil data SQL (stateless).
     """
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.1)
+    llm = ChatGoogleGenerativeAI(model=model_name, temperature=0.1)
     template = """
     Anda adalah seorang analis data AI. Berdasarkan pertanyaan asli pengguna dan data hasil query berikut, berikan jawaban dalam satu kalimat yang informatif dan mudah dimengerti.
     Pertanyaan Asli Pengguna: {question}
