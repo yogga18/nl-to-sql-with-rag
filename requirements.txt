@@ -10,7 +10,7 @@ langchain-openai
 sentence-transformers
 qdrant-client
 
-# Database Connector (Penting untuk NL-to-SQL)
+# Database Connector
 SQLAlchemy
 PyMySQL
 
