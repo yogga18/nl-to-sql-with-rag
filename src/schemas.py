@@ -3,13 +3,13 @@ from pydantic import BaseModel
 
 class QueryRequest(BaseModel):
     question: str
-    model: str = "openai/gpt-5-mini"
+    model: str = "gemini-2.5-flash"
 
     class Config:
         schema_extra = {
             "example": {
                 "question": "Tampilkan 5 program dengan anggaran terbesar di tahun 2024",
-                "model": "openai/gpt-5-mini"
+                "model": "gemini-2.5-flash"
             }
         }
 
