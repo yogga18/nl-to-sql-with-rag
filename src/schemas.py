@@ -27,13 +27,32 @@ class ContextualQueryRequest(BaseModel):
         }
 
 class OpenRouterRequest(BaseModel):
-    prompt: str
-    model: str = "openai/gpt-5-mini"
+    question: str
+    model_name: str
 
     class Config:
         schema_extra = {
             "example": {
                 "prompt": "Jelaskan tentang machine learning dalam bahasa sederhana",
                 "model": "openai/gpt-5-mini"
+            }
+        }
+
+class NLToSQLRequestEndpoint(BaseModel):
+    question: str
+    model_name: str
+    unit: str
+    nip: str
+    token_in: int = 0
+    token_out: int = 0
+    total_token: int = 0
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "question": "Tampilkan 5 program dengan anggaran terbesar di tahun 2024",
+                "model_name": "meta-llama/llama-3-70b-instruct",
+                "unit": "Direktorat Keuangan",
+                "nip": "123456789"
             }
         }
